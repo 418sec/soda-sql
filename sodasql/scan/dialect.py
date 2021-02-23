@@ -81,7 +81,7 @@ class Dialect:
     def sql_connection_test(self):
         pass
 
-    def create_connection(self):
+    def create_connection(self, *args, **kwargs):
         raise RuntimeError('TODO override and implement this abstract method')
 
     def create_scan(self, *args, **kwargs):
@@ -360,3 +360,9 @@ class Dialect:
 
     def get_type_name(self, column_description):
         return str(column_description[1])
+
+    def is_connection_error(self, exception):
+        return False
+
+    def is_authentication_error(self, exception):
+        return False
