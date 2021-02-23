@@ -38,7 +38,7 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
 
 class SQLServerDialect(Dialect):
 
-    def __init__(self, parser: Parser = None, type: str = POSTGRES):
+    def __init__(self, parser: Parser = None, type: str = SQLSERVER):
         super().__init__(type)
         if parser:
             self.host = parser.get_str_optional_env('host', 'localhost')
@@ -99,6 +99,15 @@ class SQLServerDialect(Dialect):
 
     def sql_expr_regexp_like(self, expr: str, pattern: str):
         return f"{expr} ~* '{self.qualify_regex(pattern)}'"
+
+    def sql_expr_length(self, expr):
+        return f'LEN({expr})'
+
+    def sql_expr_variance(self, expr: str):
+        return f'VAR({expr})'
+
+    def sql_expr_stddev(self, expr: str):
+        return f'STDEV({expr})'
 
     # TODO REGEX not supported by SQL SERVER
     def sql_expr_cast_text_to_number(self, quoted_column_name, validity_format):
