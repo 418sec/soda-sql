@@ -12,9 +12,8 @@ from datetime import date
 
 import pyodbc
 
-from sodasql.scan.dialect import Dialect, POSTGRES, KEY_WAREHOUSE_TYPE
+from sodasql.scan.dialect import Dialect, SQLSERVER, KEY_WAREHOUSE_TYPE
 from sodasql.scan.parser import Parser
-
 
 """
 Connecting to Microsoft SQL Example with pyodbc
@@ -34,7 +33,8 @@ with pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+da
             print (str(row[0]) + " " + str(row[1]))
             row = cursor.fetchone()
 
-"""" 
+"""
+
 
 class SQLServerDialect(Dialect):
 
@@ -66,8 +66,8 @@ class SQLServerDialect(Dialect):
         }
 
     def sql_tables_metadata_query(self, limit: str = 10, filter: str = None):
-        return (f"SELECT TABLE_NAME \n" 
-                f"FROM information_schema.tables \n" 
+        return (f"SELECT TABLE_NAME \n"
+                f"FROM information_schema.tables \n"
                 f"WHERE lower(table_schema)='{self.schema.lower()}'")
 
     def sql_connection_test(self):
@@ -75,13 +75,13 @@ class SQLServerDialect(Dialect):
 
     def create_connection(self):
         return pyodbc.connect(
-            'DRIVER={'+driver+
-            '};SERVER='+server+
-            ';PORT='+port+
-            ';DATABASE='+database+
-            ';UID='+username+
-            ';PWD='+ password)
-        
+            'DRIVER={' + self.driver +
+            '};SERVER=' + self.host +
+            ';PORT=' + self.port +
+            ';DATABASE=' + self.database +
+            ';UID=' + self.username +
+            ';PWD=' + self.password)
+
     def sql_columns_metadata_query(self, table_name: str) -> str:
         sql = (f"SELECT column_name, data_type, is_nullable \n"
                f"FROM information_schema.columns \n"
@@ -106,10 +106,8 @@ class SQLServerDialect(Dialect):
             return f"CAST({quoted_column_name} AS {self.data_type_decimal})"
         not_number_pattern = self.qualify_regex(r"[^-\d\.\,]")
         comma_pattern = self.qualify_regex(r"\,")
-        return f"CAST(REGEXP_REPLACE(REGEXP_REPLACE({quoted_column_name}, '{not_number_pattern}', '', 'g'), "\
+        return f"CAST(REGEXP_REPLACE(REGEXP_REPLACE({quoted_column_name}, '{not_number_pattern}', '', 'g'), " \
                f"'{comma_pattern}', '.', 'g') AS {self.data_type_decimal})"
 
     # def get_type_name(self, column_description):
     #     return SQLServerDialect.type_names_by_type_code.get(str(column_description[1]))
-
-   
